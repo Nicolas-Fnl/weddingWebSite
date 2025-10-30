@@ -50,11 +50,11 @@
 
             // Vérifier s'il y a un paramètre 'page' dans l'URL
             const urlParams = new URLSearchParams(window.location.search);
-            let targetPage = urlParams.get('page') || '/';
+            let targetPage = urlParams.get('page') || 'index.html';
 
             // Si mode faire-part uniquement, forcer la redirection vers fairepart
             if (CONFIG.FAIREPART_ONLY_MODE) {
-                targetPage = '/fairepart';
+                targetPage = 'fairepart';
                 // NE PAS CHARGER l'image du faire-part en mode FAIREPART_ONLY
                 fairePartWrapper.style.display = 'none';
             } else {
@@ -73,7 +73,7 @@
                 return;
             }
 
-            const cleOnly = targetPage === '/fairepart';
+            const cleOnly = targetPage === 'fairepart';
 
             // Vérifier s'il y a une clé dans l'URL
             const cle = urlParams.get('cle');

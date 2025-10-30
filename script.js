@@ -127,7 +127,7 @@ async function checkAuthentication() {
 
     // Vérifier si l'utilisateur est authentifié
     if (!isAuthenticated()) {
-        window.location.href = `/auth?page=${currentPage}`;
+        window.location.href = `auth?page=${currentPage}`;
     } else {
         // Décrypter les contenus
         await decryptNames();
@@ -281,7 +281,7 @@ window.addEventListener('scroll', () => {
  */
 function logout() {
     clearAuthToken();
-    window.location.href = '/auth';
+    window.location.href = 'auth';
 }
 
 // Exposer les fonctions globalement (utiles pour les tests et le debugging)
