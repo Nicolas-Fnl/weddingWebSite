@@ -96,26 +96,37 @@
             const search = window.location.search;
             const hash = window.location.hash;
 
-            // Si l'URL se termine par .html, rediriger vers la version sans .html
-            if (path.endsWith('.html') && path !== '/index.html') {
+            // Vérifier si on a déjà essayé de rediriger (éviter boucle infinie)
+            const redirectAttemptKey = 'redirect_attempt_' + path;
+            const hasAttempted = sessionStorage.getItem(redirectAttemptKey);
+
+            // Si l'URL se termine par .html (sauf index.html), rediriger vers la version sans .html
+            if (path.endsWith('.html') && !path.endsWith('/index.html')) {
                 const cleanPath = path.replace(/\.html$/, '');
+                sessionStorage.setItem(redirectAttemptKey, 'true');
                 window.location.replace(cleanPath + search + hash);
                 return;
             }
 
             // Si l'URL ne se termine pas par .html et n'est pas la racine
             if (!path.endsWith('.html') && !path.endsWith('/') && path !== '/') {
-                // Essayer de charger avec .html
-                const htmlPath = path + '.html' + search + hash;
+                // Si on n'a pas encore essayé de rediriger
+                if (!hasAttempted) {
+                    // Marquer qu'on a essayé
+                    sessionStorage.setItem(redirectAttemptKey, 'true');
 
-                // Tenter la redirection
-                window.location.replace(htmlPath);
-
-                // Si après 2 secondes on est toujours là, afficher le 404
-                setTimeout(function() {
-                    document.getElementById('redirecting').style.display = 'none';
-                    document.getElementById('notFound').style.display = 'block';
-                }, 2000);
+                    // Essayer de charger avec .html
+                    const htmlPath = path + '.html' + search + hash;
+                    window.location.replace(htmlPath);
+                    return;
+                } else {
+                    // On a déjà essayé et on est revenu ici = page n'existe pas
+                    sessionStorage.removeItem(redirectAttemptKey);
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.getElementById('redirecting').style.display = 'none';
+                        document.getElementById('notFound').style.display = 'block';
+                    });
+                }
             } else {
                 // Page vraiment introuvable
                 document.addEventListener('DOMContentLoaded', function() {
