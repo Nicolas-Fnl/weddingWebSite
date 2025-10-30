@@ -50,7 +50,7 @@
 
             // Vérifier s'il y a un paramètre 'page' dans l'URL
             const urlParams = new URLSearchParams(window.location.search);
-            let targetPage = urlParams.get('page') || 'index.html';
+            let targetPage = urlParams.get('page') || './';
 
             // Si mode faire-part uniquement, forcer la redirection vers fairepart
             if (CONFIG.FAIREPART_ONLY_MODE) {
