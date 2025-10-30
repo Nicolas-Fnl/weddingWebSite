@@ -4,8 +4,19 @@
 (function() {
     const pathname = window.location.pathname;
 
-    // Rediriger si l'URL se termine par .html (sauf /index.html)
-    if (pathname.endsWith('.html') && !pathname.endsWith('/index.html')) {
+    // Rediriger /index.html ou /index vers /
+    if (pathname.endsWith('/index.html') || pathname.endsWith('/index')) {
+        const basePath = pathname.replace(/\/index(\.html)?$/, '/');
+        window.location.replace(
+            basePath +
+            window.location.search +
+            window.location.hash
+        );
+        return;
+    }
+
+    // Rediriger si l'URL se termine par .html
+    if (pathname.endsWith('.html')) {
         window.location.replace(
             pathname.replace(/\.html$/, '') +
             window.location.search +
