@@ -97,7 +97,7 @@ async function checkAuthentication() {
     }
 
     // Obtenir le nom de la page actuelle
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').pop() || '';
 
     // Ne pas vérifier l'auth sur les pages publiques
     if (PUBLIC_PAGES.includes(currentPage)) return;
@@ -127,7 +127,12 @@ async function checkAuthentication() {
 
     // Vérifier si l'utilisateur est authentifié
     if (!isAuthenticated()) {
-        window.location.href = `auth?page=${currentPage}`;
+        // Si on est à la racine (index.html ou /), rediriger sans paramètre page
+        if (!currentPage || currentPage === 'index.html' || currentPage === 'index') {
+            window.location.href = 'auth';
+        } else {
+            window.location.href = `auth?page=${currentPage}`;
+        }
     } else {
         // Décrypter les contenus
         await decryptNames();
