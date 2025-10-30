@@ -411,6 +411,11 @@ a:hover {
     line-height: 1.8;
 }
 
+/* Icône map SVG */
+.pin-ico{
+    max-height: 26px;
+}
+
 /* === INFO GRID === */
 .info-grid {
     display: grid;
