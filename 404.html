@@ -65,96 +65,16 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
-
-        #redirecting {
-            display: block;
-        }
-
-        #notFound {
-            display: none;
-        }
-
-        .loader {
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top: 3px solid #fff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
-    <script>
-        // GitHub Pages hack pour URLs propres sans .html
-        (function() {
-            const path = window.location.pathname;
-            const search = window.location.search;
-            const hash = window.location.hash;
-
-            // Vérifier si on a déjà essayé de rediriger (éviter boucle infinie)
-            const redirectAttemptKey = 'redirect_attempt_' + path;
-            const hasAttempted = sessionStorage.getItem(redirectAttemptKey);
-
-            // Si l'URL se termine par .html (sauf index.html), rediriger vers la version sans .html
-            if (path.endsWith('.html') && !path.endsWith('/index.html')) {
-                const cleanPath = path.replace(/\.html$/, '');
-                sessionStorage.setItem(redirectAttemptKey, 'true');
-                window.location.replace(cleanPath + search + hash);
-                return;
-            }
-
-            // Si l'URL ne se termine pas par .html et n'est pas la racine
-            if (!path.endsWith('.html') && !path.endsWith('/') && path !== '/') {
-                // Si on n'a pas encore essayé de rediriger
-                if (!hasAttempted) {
-                    // Marquer qu'on a essayé
-                    sessionStorage.setItem(redirectAttemptKey, 'true');
-
-                    // Essayer de charger avec .html
-                    const htmlPath = path + '.html' + search + hash;
-                    window.location.replace(htmlPath);
-                    return;
-                } else {
-                    // On a déjà essayé et on est revenu ici = page n'existe pas
-                    sessionStorage.removeItem(redirectAttemptKey);
-                    document.addEventListener('DOMContentLoaded', function() {
-                        document.getElementById('redirecting').style.display = 'none';
-                        document.getElementById('notFound').style.display = 'block';
-                    });
-                }
-            } else {
-                // Page vraiment introuvable
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('redirecting').style.display = 'none';
-                    document.getElementById('notFound').style.display = 'block';
-                });
-            }
-        })();
-    </script>
 </head>
 <body>
     <div class="container">
-        <!-- Message pendant la redirection -->
-        <div id="redirecting">
-            <div class="error-code">⏳</div>
-            <h1>Redirection en cours...</h1>
-            <div class="loader"></div>
-        </div>
-
-        <!-- Message 404 si la page n'existe pas -->
-        <div id="notFound">
-            <div class="error-code">404</div>
-            <h1>Page introuvable</h1>
-            <p>
-                Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
-            </p>
-            <a href="./" class="btn">Retour à l'accueil</a>
-        </div>
+        <div class="error-code">404</div>
+        <h1>Page introuvable</h1>
+        <p>
+            Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+        </p>
+        <a href="./" class="btn">Retour à l'accueil</a>
     </div>
 </body>
 </html>

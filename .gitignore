@@ -27,3 +27,6 @@ npm-debug.log*
 # Configuration locale Claude Code (contient potentiellement des informations sensibles)
 .claude/
 .claude/**/*
+
+# Documentation (fichiers Markdown)
+*.md
