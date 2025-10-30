@@ -131,7 +131,9 @@ async function checkAuthentication() {
         if (!currentPage || currentPage === 'index.html' || currentPage === 'index') {
             window.location.href = 'auth';
         } else {
-            window.location.href = `auth?page=${currentPage}`;
+            // Enlever l'extension .html du paramètre page
+            const pageParam = currentPage.replace('.html', '');
+            window.location.href = `auth?page=${pageParam}`;
         }
     } else {
         // Décrypter les contenus

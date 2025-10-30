@@ -3,22 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirection...</title>
+    <title>Page introuvable</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+
+        .error-code {
+            font-family: 'Playfair Display', serif;
+            font-size: 120px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #fff;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        #redirecting {
+            display: block;
+        }
+
+        #notFound {
+            display: none;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
     <script>
         // GitHub Pages hack pour URLs propres sans .html
-        // Redirige automatiquement /page vers /page.html
         (function() {
             const path = window.location.pathname;
+            const search = window.location.search;
+            const hash = window.location.hash;
+
+            // Si l'URL se termine par .html, rediriger vers la version sans .html
+            if (path.endsWith('.html') && path !== '/index.html') {
+                const cleanPath = path.replace(/\.html$/, '');
+                window.location.replace(cleanPath + search + hash);
+                return;
+            }
 
             // Si l'URL ne se termine pas par .html et n'est pas la racine
             if (!path.endsWith('.html') && !path.endsWith('/') && path !== '/') {
-                // Rediriger vers la même URL avec .html
-                window.location.replace(path + '.html' + window.location.search + window.location.hash);
+                // Essayer de charger avec .html
+                const htmlPath = path + '.html' + search + hash;
+
+                // Tenter la redirection
+                window.location.replace(htmlPath);
+
+                // Si après 2 secondes on est toujours là, afficher le 404
+                setTimeout(function() {
+                    document.getElementById('redirecting').style.display = 'none';
+                    document.getElementById('notFound').style.display = 'block';
+                }, 2000);
+            } else {
+                // Page vraiment introuvable
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('redirecting').style.display = 'none';
+                    document.getElementById('notFound').style.display = 'block';
+                });
             }
         })();
     </script>
 </head>
 <body>
-    <p>Redirection en cours...</p>
+    <div class="container">
+        <!-- Message pendant la redirection -->
+        <div id="redirecting">
+            <div class="error-code">⏳</div>
+            <h1>Redirection en cours...</h1>
+            <div class="loader"></div>
+        </div>
+
+        <!-- Message 404 si la page n'existe pas -->
+        <div id="notFound">
+            <div class="error-code">404</div>
+            <h1>Page introuvable</h1>
+            <p>
+                Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+            </p>
+            <a href="./" class="btn">Retour à l'accueil</a>
+        </div>
+    </div>
 </body>
 </html>
