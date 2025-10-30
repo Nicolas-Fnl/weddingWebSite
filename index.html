@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{bride_groom}} - Notre Mariage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Écran d'accueil avec animation d'ouverture des portes -->
+    <div class="door-animation-container" id="doorContainer">
+        <div class="door-left">
+            <img src="images/faire-part-gauche.png" alt="Faire-part" class="door-image">
+        </div>
+        <div class="door-right">
+            <img src="images/faire-part-droite.png" alt="Faire-part" class="door-image">
+        </div>
+    </div>
+
+    <!-- Contenu principal (caché initialement) -->
+    <div class="main-content" id="mainContent">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">D & N</a>
+            <ul class="nav-menu">
+                <li><a href="/rsvp">RSVP</a></li>
+                <li><a href="/hebergements">Hébergements</a></li>
+                <li><a href="/cadeaux">Liste de Mariage</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">{{bride_groom}}</h1>
+            <div class="hero-divider"></div>
+            <p class="hero-date">20 Juin 2026</p>
+            <p class="hero-location">Solignac, France</p>
+        </div>
+    </section>
+
+    <!-- Couple Section -->
+    <section class="section couple-section">
+        <div class="container">
+            <h2 class="section-title">Nous nous marions !</h2>
+            <p class="section-intro">
+                Après plusieurs années d'amour et de complicité, nous avons décidé de nous unir
+                et de célébrer notre union avec vous, nos proches.
+            </p>
+            <p class="section-intro">
+                Ce sera pour nous une immense joie de partager ce moment unique en votre compagnie.
+            </p>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="section timeline-section">
+        <div class="container">
+            <h2 class="section-title">Programme de la journée</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Cérémonie</h3>
+                        <p class="timeline-time">15h00</p>
+                        <p class="timeline-description">
+                            Abbatiale de Solignac<br>
+                            Place de l'Abbaye, 87110 Solignac
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Vin d'honneur</h3>
+                        <p class="timeline-time">17h00</p>
+                        <p class="timeline-description">
+                            Jardin du Château de Brie<br>
+                            Château de Brie, 87140 Champagnac-la-Rivière
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">Dîner & Soirée</h3>
+                        <p class="timeline-time">19h30</p>
+                        <p class="timeline-description">
+                            Salle de réception du Château de Brie<br>
+                            Soirée dansante jusqu'à 4h00
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Pratiques Section -->
+    <section class="section info-section">
+        <div class="container">
+            <h2 class="section-title">Informations pratiques</h2>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <h3>Plan d'accès</h3>
+                    <p>Château de Brie</p>
+                    <p>Château de Brie<br>87140 Champagnac-la-Rivière</p>
+                    <a href="https://maps.google.com/maps?q=Château+de+Brie+Champagnac-la-Rivière" target="_blank" class="btn-link">Voir sur Google Maps</a>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">👔</div>
+                    <h3>Dress code</h3>
+                    <p>Élégance sobre</p>
+                    <p>Couleurs conseillées :<br>Tons beige, champagne, or et pastels</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">☀️</div>
+                    <h3>Météo</h3>
+                    <p>Prévisions mi-juin en Limousin</p>
+                    <p>20-25°C en journée<br>Prévoir une petite laine pour la soirée</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mini Gallery Section -->
+    <section class="section gallery-section">
+        <div class="container">
+            <h2 class="section-title">Quelques souvenirs</h2>
+            <div class="gallery-grid">
+                <!-- Image encryptée (sera décryptée après authentification) -->
+                <div class="gallery-item">
+                    <img src="" alt="Souvenir 1" data-encrypted="images/love.png.enc" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                </div>
+                <!-- Placeholders pour les autres photos -->
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <span>📸</span>
+                        <p>Photo 2</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <span>📸</span>
+                        <p>Photo 3</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <span>📸</span>
+                        <p>Photo 4</p>
+                    </div>
+                </div>
+            </div>
+            <p class="gallery-note">Les photos sont protégées et décryptées uniquement après authentification</p>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+        <div class="container">
+            <h2 class="section-title">Confirmez votre présence</h2>
+            <p class="cta-text">
+                Nous serions ravis de savoir si vous pouvez nous rejoindre ce jour si spécial.
+            </p>
+            <a href="/rsvp" class="btn-primary">Répondre à l'invitation</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    </div> <!-- Fin du main-content -->
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Vérifier si le mode faire-part uniquement est activé
+        if (CONFIG.FAIREPART_ONLY_MODE) {
+            window.location.href = '/auth';
+        }
+    </script>
+</body>
+</html>
