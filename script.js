@@ -6,8 +6,8 @@
 // Nom de la clé pour le localStorage
 const AUTH_TOKEN_KEY = 'wedding_auth_token';
 
-// Pages qui ne nécessitent pas d'authentification
-const PUBLIC_PAGES = ['auth.html'];
+// Pages qui ne nécessitent pas d'authentification (avec et sans .html pour GitHub Pages)
+const PUBLIC_PAGES = ['auth.html', 'auth', 'fairepart.html', 'fairepart'];
 
 // Variables globales pour les noms des mariés (décryptés après authentification)
 let groomName = '';
