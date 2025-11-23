@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faire-part - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Contact Section -->
+    <section class="section contact-page">
+        <div class="container">
+            <h1 class="page-title">Faire-part</h1>
+            <p class="page-subtitle">
+                Nous nous marions à <strong>l'Abbaye Saint-Pierre-Saint-Paul</strong>, 87110 Solignac<br>
+                le <strong>20 juin 2026, à 15h</strong>.
+            </p>
+            <p class="page-subtitle">
+                Puis nous poursuivrons les festivités au<br>
+                <strong>Château de Brie</strong>, 87150 Champagnac-la-Rivière
+            </p>
+            <p class="page-subtitle intro-cta">
+                Pour recevoir un faire-part physique ou digital,<br>
+                complète les informations nécessaires !
+            </p>
+
+            <!-- Message de confirmation -->
+            <div id="confirmation-message" class="confirmation-message hidden"></div>
+
+            <!-- Validation visuelle -->
+            <div id="success-validation" class="success-validation hidden">
+                <canvas id="fireworks-canvas" class="fireworks-canvas"></canvas>
+                <div class="success-content">
+                    <h2 class="success-title">Validé ✓</h2>
+                    <p class="success-text">Merci ! Vos informations ont bien été enregistrées.</p>
+                </div>
+            </div>
+
+            <!-- Formulaire Contact -->
+            <form id="contact-form" class="contact-form-container">
+                <!-- Section personnes (remplie dynamiquement) -->
+                <div id="personnes-section" class="personnes-section hidden">
+                </div>
+
+                <!-- Boutons +1 et -1 -->
+                <div id="btn-container" class="btn-plusmoins-container">
+                    <button type="button" class="btn-moins-un hidden" id="remove-last-btn">
+                        -1
+                    </button>
+                    <button type="button" class="btn-add-accompagnant" id="add-btn">
+                        +1
+                    </button>
+                </div>
+
+                <!-- Type de faire-part -->
+                <div id="type-section" class="type-section">
+                    <div class="form-group">
+                        <label>Type de faire-part préféré *</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="type-fairepart" value="email" id="type-email" checked>
+                                <span>Email</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="type-fairepart" value="postal" id="type-postal">
+                                <span>Postal</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div id="email-section" class="email-section">
+                    <div class="form-group">
+                        <label for="email">Adresse email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="votre.email@exemple.com"
+                        >
+                    </div>
+                </div>
+
+                <!-- Adresse postale -->
+                <div id="adresse-section" class="adresse-section">
+                    <div class="form-group">
+                        <label for="adresse">Adresse postale</label>
+                        <textarea
+                            id="adresse"
+                            name="adresse"
+                            rows="3"
+                            placeholder="Votre adresse complète"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Numéro -->
+                <div id="numero-section" class="numero-section">
+                    <div class="form-group">
+                        <label for="numero">Numéro de téléphone *</label>
+                        <input
+                            type="tel"
+                            id="numero"
+                            name="numero"
+                            placeholder="+33 6 12 34 56 78"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    <span id="btn-text">Envoyer</span>
+                    <span id="btn-loader" class="loader hidden"></span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} <a href="" id="whatsappLink" target="_blank" rel="noopener noreferrer" onclick="return false"><img src="images/whatsapp.png" alt="WhatsApp" class="whatsapp-icon"></a> - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Note: L'authentification est gérée automatiquement par script.js
+        // via son écouteur DOMContentLoaded qui appelle checkAuthentication()
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[FAIREPART] Initialisation du formulaire faire-part');
+
+            // Initialisation du formulaire
+            const form = document.getElementById('contact-form');
+            const personnesSection = document.getElementById('personnes-section');
+            const addBtn = document.getElementById('add-btn');
+            const removeLastBtn = document.getElementById('remove-last-btn');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+
+            let personneCounter = 0;
+
+            // Ajouter une personne par défaut au chargement
+            addPersonne();
+
+            // Ajouter une personne
+            addBtn.addEventListener('click', () => {
+                addPersonne();
+            });
+
+            // Supprimer la dernière personne
+            removeLastBtn.addEventListener('click', () => {
+                removeLastPersonne();
+            });
+
+            // Fonction pour créer une personne
+            function addPersonne() {
+                personneCounter++;
+                const id = personneCounter;
+
+                const personneDiv = document.createElement('div');
+                personneDiv.classList.add('personne-item');
+                personneDiv.dataset.id = id;
+                personneDiv.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personne-nom-${id}">Nom *</label>
+                            <input
+                                type="text"
+                                id="personne-nom-${id}"
+                                name="personne-nom-${id}"
+                                placeholder="Nom"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="personne-prenom-${id}">Prénom *</label>
+                            <input
+                                type="text"
+                                id="personne-prenom-${id}"
+                                name="personne-prenom-${id}"
+                                placeholder="Prénom"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Participation à la chorale</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="personne-chorale-${id}" value="oui">
+                                <span>Oui</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="personne-chorale-${id}" value="non" checked>
+                                <span>Non</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Joue d'un instrument de musique</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="personne-instrument-${id}" value="oui" class="instrument-radio" data-personne-id="${id}">
+                                <span>Oui</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="personne-instrument-${id}" value="non" checked>
+                                <span>Non</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group instrument-detail hidden" id="instrument-detail-${id}">
+                        <label for="personne-instrument-detail-${id}">Quel instrument ?</label>
+                        <input
+                            type="text"
+                            id="personne-instrument-detail-${id}"
+                            name="personne-instrument-detail-${id}"
+                            placeholder="Piano, guitare, violon..."
+                        >
+                    </div>
+                `;
+
+                personnesSection.appendChild(personneDiv);
+                personnesSection.classList.remove('hidden');
+
+                // Ajouter les événements pour afficher/masquer le champ instrument
+                const instrumentRadios = personneDiv.querySelectorAll('.instrument-radio');
+                instrumentRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const personneId = this.dataset.personneId;
+                        const instrumentDetail = document.getElementById(`instrument-detail-${personneId}`);
+                        const instrumentInput = document.getElementById(`personne-instrument-detail-${personneId}`);
+
+                        if (this.value === 'oui' && this.checked) {
+                            instrumentDetail.classList.remove('hidden');
+                            instrumentInput.setAttribute('required', 'required');
+                        }
+                    });
+                });
+
+                // Gérer le clic sur "non" pour masquer le champ
+                const instrumentNonRadio = personneDiv.querySelector(`input[name="personne-instrument-${id}"][value="non"]`);
+                instrumentNonRadio.addEventListener('change', function() {
+                    if (this.checked) {
+                        const instrumentDetail = document.getElementById(`instrument-detail-${id}`);
+                        const instrumentInput = document.getElementById(`personne-instrument-detail-${id}`);
+                        instrumentDetail.classList.add('hidden');
+                        instrumentInput.removeAttribute('required');
+                        instrumentInput.value = '';
+                    }
+                });
+
+                // Afficher le bouton -1 seulement s'il y a au moins 2 personnes
+                const personneCount = personnesSection.querySelectorAll('.personne-item').length;
+                if (personneCount >= 2) {
+                    removeLastBtn.classList.remove('hidden');
+                }
+            }
+
+            // Fonction pour supprimer la dernière personne
+            function removeLastPersonne() {
+                const personneItems = personnesSection.querySelectorAll('.personne-item');
+                if (personneItems.length > 1) {
+                    const lastItem = personneItems[personneItems.length - 1];
+                    lastItem.remove();
+
+                    // Masquer le bouton -1 s'il ne reste qu'une personne
+                    if (personnesSection.querySelectorAll('.personne-item').length === 1) {
+                        removeLastBtn.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Soumission du formulaire
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const data = {
+                    typeFairepart: formData.get('type-fairepart'),
+                    personnes: [],
+                    email: formData.get('email') || '',
+                    adresse: formData.get('adresse') || '',
+                    numero: formData.get('numero'),
+                    timestamp: new Date().toISOString()
+                };
+
+                // Récupérer toutes les personnes
+                document.querySelectorAll('.personne-item').forEach(item => {
+                    const id = item.dataset.id;
+                    const nom = formData.get(`personne-nom-${id}`);
+                    const prenom = formData.get(`personne-prenom-${id}`);
+                    if (nom && prenom) {
+                        const personne = {
+                            nom: nom.trim(),
+                            prenom: prenom.trim(),
+                            chorale: formData.get(`personne-chorale-${id}`) || 'non',
+                            instrument: formData.get(`personne-instrument-${id}`) || 'non'
+                        };
+
+                        // Ajouter le détail de l'instrument si "oui"
+                        if (personne.instrument === 'oui') {
+                            personne.instrumentDetail = formData.get(`personne-instrument-detail-${id}`) || '';
+                        }
+
+                        data.personnes.push(personne);
+                    }
+                });
+
+                setLoading(true, submitBtn, btnText, btnLoader);
+
+                try {
+                    // Créer un FormData pour envoyer en format form-data
+                    const submitFormData = new FormData();
+                    submitFormData.append('payload', JSON.stringify(data));
+
+                    const response = await fetch(CONFIG.CONTACT_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                        body: submitFormData
+                    });
+
+                    if (response.ok) {
+                        // Masquer le formulaire avec animation
+                        form.style.opacity = '0';
+                        form.style.transform = 'scale(0.95)';
+
+                        setTimeout(() => {
+                            form.classList.add('hidden');
+                            // Afficher la validation avec animation
+                            const successValidation = document.getElementById('success-validation');
+                            successValidation.classList.remove('hidden');
+                            setTimeout(() => {
+                                successValidation.style.opacity = '1';
+                                successValidation.style.transform = 'scale(1)';
+                                // Démarrer les feux d'artifice
+                                startFireworks();
+                            }, 10);
+                        }, 300);
+                    } else {
+                        throw new Error('Erreur serveur');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    showConfirmation(confirmationMessage, 'error', 'Une erreur est survenue. Veuillez réessayer ou nous contacter directement.');
+                } finally {
+                    setLoading(false, submitBtn, btnText, btnLoader);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# Images originales (non encryptées) - NE JAMAIS COMMITTER
+images/*.png
+images/*.jpg
+images/*.jpeg
+images/*.gif
+
+# Autoriser les images encryptées
+!images/*.enc
+
+# Autoriser les images de faire-part (publiques)
+!images/faire-part.png
+!images/faire-part-droite.png
+!images/faire-part-gauche.png
+
+# Autoriser l'icône WhatsApp (publique)
+!images/whatsapp.png
+
+# Node modules (si vous utilisez npm)
+node_modules/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Configuration locale Claude Code (contient potentiellement des informations sensibles)
+.claude/
+.claude/**/*
+
+# Documentation (fichiers Markdown)
+*.md
+
+# Configuration VSCode
+*.vscode

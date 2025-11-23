@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès au site - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-static-page">
+    <!-- Page d'authentification statique avec faire-part -->
+    <div class="auth-static-container">
+        <!-- Image du faire-part centrée (chargée dynamiquement) -->
+        <div class="auth-faire-part-wrapper" id="authFairePartWrapper">
+            <!-- L'image sera insérée ici si FAIREPART_ONLY_MODE est désactivé -->
+        </div>
+
+        <!-- Formulaire d'authentification en bas -->
+        <div class="auth-form-box" id="authFormBox">
+            <h2 class="auth-form-title">Bienvenue</h2>
+            <p class="auth-form-subtitle">Entrez le prénom de l'un des mariés</p>
+            <form class="auth-form" id="authForm">
+                <div class="auth-input-group">
+                    <input type="text" id="authInput" class="auth-input" placeholder="Prénom" required autocomplete="off">
+                </div>
+                <button type="submit" class="auth-submit-button" id="authSubmit">
+                    <span class="auth-button-text">Entrer</span>
+                    <span class="auth-loader hidden"></span>
+                </button>
+                <div class="auth-error-message hidden" id="authErrorMessage">
+                    Prénom incorrect
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Logique spécifique à la page d'authentification statique
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authFormBox = document.getElementById('authFormBox');
+            const authForm = document.getElementById('authForm');
+            const authInput = document.getElementById('authInput');
+            const authSubmit = document.getElementById('authSubmit');
+            const authErrorMessage = document.getElementById('authErrorMessage');
+            const fairePartWrapper = document.getElementById('authFairePartWrapper');
+
+            // Vérifier s'il y a un paramètre 'page' dans l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            let targetPage = urlParams.get('page') || './';
+
+            // Si mode faire-part uniquement, forcer la redirection vers fairepart
+            if (CONFIG.FAIREPART_ONLY_MODE) {
+                targetPage = 'fairepart';
+                // NE PAS CHARGER l'image du faire-part en mode FAIREPART_ONLY
+                fairePartWrapper.style.display = 'none';
+            } else {
+                // Charger l'image du faire-part uniquement si le mode n'est pas activé
+                const img = document.createElement('img');
+                img.src = 'images/faire-part.png';
+                img.alt = 'Faire-part';
+                img.className = 'auth-faire-part-image';
+                fairePartWrapper.appendChild(img);
+            }
+
+            // Vérifier si l'utilisateur est déjà authentifié
+            if (isAuthenticated()) {
+                console.log('[AUTH] Déjà authentifié, redirection vers', targetPage);
+                window.location.href = targetPage;
+                return;
+            }
+
+            const cleOnly = targetPage === 'fairepart';
+
+            // Vérifier s'il y a une clé dans l'URL
+            const cle = urlParams.get('cle');
+
+            if (cle) {
+                // Vérification automatique avec la clé
+                authFormBox.style.opacity = '0.5';
+                authSubmit.disabled = true;
+
+                const authData = await verifyAuthentication(cle);
+
+                if (authData && authData.status === 'ok' && authData.token) {
+                    setAuthToken(authData.token);
+                    // Rediriger vers la page cible
+                    window.location.href = targetPage;
+                    return;
+                } else {
+                    // Afficher le formulaire si la clé est invalide
+                    authFormBox.style.opacity = '1';
+                    authSubmit.disabled = false;
+                    authErrorMessage.textContent = cleOnly ? "Lien invalide. Veuillez entrer votre clé d'accès." : "Lien invalide. Veuillez entrer le prénom de l'un des mariés.";
+                    authErrorMessage.classList.add('show');
+                }
+            } else {
+                // Pas de clé dans l'URL, afficher le formulaire normalement
+                authFormBox.style.opacity = '1';
+                authSubmit.disabled = false;
+            }
+
+            // Gérer la soumission du formulaire d'authentification
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const inputValue = authInput.value.trim();
+
+                if (!inputValue) {
+                    return;
+                }
+
+                // Désactiver le bouton et afficher le loader
+                authSubmit.disabled = true;
+                const buttonText = authSubmit.querySelector('.auth-button-text');
+                const loader = authSubmit.querySelector('.auth-loader');
+                buttonText.classList.add('hidden');
+                loader.classList.remove('hidden');
+
+                // Masquer le message d'erreur
+                authErrorMessage.classList.remove('show');
+
+                // Vérifier l'authentification
+                console.log('[AUTH] Vérification de:', inputValue);
+                const authData = await verifyAuthentication(inputValue);
+                console.log('[AUTH] Résultat de la vérification:', authData);
+
+                if (authData && authData.status === 'ok' && authData.token) {
+                    // Authentification réussie
+                    setAuthToken(authData.token);
+                    console.log('[AUTH] Authentification réussie, redirection vers', targetPage);
+                    console.log('[AUTH] cleOnly =', cleOnly);
+
+                    // Rediriger vers la page cible
+                    console.log('[AUTH] URL de redirection:', targetPage);
+                    window.location.href = targetPage;
+                } else {
+                    // Authentification échouée
+                    console.log('[AUTH] Authentification échouée');
+
+                    // Réactiver le bouton
+                    authSubmit.disabled = false;
+                    buttonText.classList.remove('hidden');
+                    loader.classList.add('hidden');
+
+                    // Afficher le message d'erreur
+                    authErrorMessage.classList.add('show');
+
+                    // Masquer le message d'erreur après 3 secondes
+                    setTimeout(() => {
+                        authErrorMessage.classList.remove('show');
+                    }, 3000);
+
+                    // Vider le champ
+                    authInput.value = '';
+                    authInput.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

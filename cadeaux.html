@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de Mariage - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="./" class="nav-logo">D & N</a>
+            <ul class="nav-menu">
+                <li><a href="hebergements">Hébergements</a></li>
+                <li><a href="cadeaux" class="active">Liste de Mariage</a></li>
+                <li><a href="musique">Musique</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Cadeaux Section -->
+    <section class="section cadeaux-page">
+        <div class="container">
+            <h1 class="page-title">Liste de Mariage</h1>
+            <p class="page-subtitle">
+                Votre présence à nos côtés est le plus beau des cadeaux.<br>
+                Si vous souhaitez néanmoins nous gâter, voici quelques suggestions.
+            </p>
+
+            <!-- Message principal -->
+            <div class="cadeaux-intro">
+                <p>
+                    Pour nous aider à démarrer notre vie commune, nous avons créé une liste de mariage
+                    ainsi qu'une cagnotte pour notre voyage de noces.
+                </p>
+            </div>
+
+            <!-- Grille des options -->
+            <div class="cadeaux-grid">
+                <!-- Option 1: Liste de mariage en ligne -->
+                <div class="cadeau-card">
+                    <div class="cadeau-icon">🎁</div>
+                    <h3>Liste de Mariage</h3>
+                    <p>Nous avons créé une liste de mariage en ligne avec des articles pour notre nouveau foyer.</p>
+                    <div class="cadeau-links">
+                        <a href="https://www.exemple-liste1.fr" target="_blank" class="btn-link">
+                            Voir la liste sur Site 1
+                        </a>
+                        <a href="https://www.exemple-liste2.fr" target="_blank" class="btn-link">
+                            Voir la liste sur Site 2
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Option 2: Voyage de noces -->
+                <div class="cadeau-card">
+                    <div class="cadeau-icon">✈️</div>
+                    <h3>Voyage de Noces</h3>
+                    <p>Nous partons découvrir le Japon cet été ! Chaque contribution nous aidera à vivre des moments inoubliables.</p>
+                    <a href="https://www.leetchi.com/c/exemple" target="_blank" class="btn-link">
+                        Participer à la cagnotte
+                    </a>
+                </div>
+
+                <!-- Option 3: Virement / Chèque -->
+                <div class="cadeau-card">
+                    <div class="cadeau-icon">💌</div>
+                    <h3>Participation Libre</h3>
+                    <p>Si vous préférez, vous pouvez également nous faire parvenir un chèque ou effectuer un virement.</p>
+                    <button class="btn-link" onclick="showBankDetails()">
+                        Voir les coordonnées bancaires
+                    </button>
+
+                    <!-- Coordonnées bancaires (masquées par défaut) -->
+                    <div id="bank-details" class="bank-details hidden">
+                        <h4>Coordonnées bancaires</h4>
+                        <div class="bank-info">
+                            <p><strong>Titulaire :</strong> {{bride}} Dupont & {{groom}} Martin</p>
+                            <p><strong>IBAN :</strong> FR76 XXXX XXXX XXXX XXXX XXXX XXX</p>
+                            <p><strong>BIC :</strong> XXXXXXXX</p>
+                        </div>
+                        <p class="bank-note">
+                            <small>Ou déposez un chèque à l'ordre de "{{bride}} Dupont & {{groom}} Martin" le jour J.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section alternative -->
+            <div class="cadeaux-alternative">
+                <h3>Idées alternatives</h3>
+                <p>
+                    Si vous souhaitez nous faire un cadeau plus personnel, voici quelques idées :
+                </p>
+                <ul class="alternative-list">
+                    <li>📚 Des livres de cuisine du monde</li>
+                    <li>🍷 Une bouteille de vin de garde (millésime 2026)</li>
+                    <li>🌱 Une plante pour notre futur jardin</li>
+                    <li>🎨 Une œuvre d'art ou photo encadrée</li>
+                    <li>🎵 Un vinyle de nos artistes préférés</li>
+                </ul>
+            </div>
+
+            <!-- Message de remerciement -->
+            <div class="cadeaux-thanks">
+                <p class="thanks-message">
+                    Quel que soit votre choix, nous vous remercions du fond du cœur<br>
+                    pour votre générosité et votre présence à nos côtés. ❤️
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} <a href="" id="whatsappLink" target="_blank" rel="noopener noreferrer" onclick="return false"><img src="images/whatsapp.png" alt="WhatsApp" class="whatsapp-icon"></a> - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Vérifier si le mode faire-part uniquement est activé
+        if (CONFIG.FAIREPART_ONLY_MODE) {
+            window.location.href = 'auth';
+        }
+
+        // Afficher/masquer les coordonnées bancaires
+        function showBankDetails() {
+            const bankDetails = document.getElementById('bank-details');
+            bankDetails.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

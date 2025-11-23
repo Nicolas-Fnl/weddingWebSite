@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="./" class="nav-logo">D & N</a>
+            <ul class="nav-menu">
+                <li><a href="hebergements">Hébergements</a></li>
+                <li><a href="cadeaux">Liste de Mariage</a></li>
+                <li><a href="musique">Musique</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- RSVP Section -->
+    <section class="section rsvp-page">
+        <div class="container">
+            <h1 class="page-title">Confirmez votre présence</h1>
+            <p class="page-subtitle">
+                Nous serions ravis de vous compter parmi nous pour célébrer notre union.<br>
+                Merci de confirmer votre présence avant le <strong>1er Juin 2026</strong>.
+            </p>
+
+            <!-- Message de confirmation -->
+            <div id="confirmation-message" class="confirmation-message hidden"></div>
+
+            <!-- Validation visuelle -->
+            <div id="success-validation" class="success-validation hidden">
+                <canvas id="fireworks-canvas" class="fireworks-canvas"></canvas>
+                <div class="success-content">
+                    <h2 class="success-title">Validé ✓</h2>
+                    <p class="success-text">Merci ! Votre réponse a bien été enregistrée.</p>
+                </div>
+            </div>
+
+            <!-- Formulaire RSVP -->
+            <form id="rsvp-form" class="rsvp-form-container">
+                <!-- Présence -->
+                <div class="form-group">
+                    <label for="presence">Présence *</label>
+                    <select id="presence" name="presence" required>
+                        <option value="">Sélectionnez...</option>
+                        <option value="oui">Oui</option>
+                        <option value="non">Non</option>
+                    </select>
+                </div>
+
+                <!-- Section personnes (remplie dynamiquement) -->
+                <div id="personnes-section" class="personnes-section hidden">
+                </div>
+
+                <!-- Boutons +1 et -1 -->
+                <div id="btn-container" class="btn-plusmoins-container">
+                    <button type="button" class="btn-moins-un hidden" id="remove-last-btn">
+                        -1
+                    </button>
+                    <button type="button" class="btn-add-accompagnant" id="add-btn">
+                        +1
+                    </button>
+                </div>
+
+                <!-- Message -->
+                <div id="message-section" class="message-section">
+                    <div class="form-group">
+                        <label for="message">Message pour les mariés</label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            rows="4"
+                            placeholder="Un petit mot doux..."
+                        ></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    <span id="btn-text">Envoyer</span>
+                    <span id="btn-loader" class="loader hidden"></span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} <a href="" id="whatsappLink" target="_blank" rel="noopener noreferrer" onclick="return false"><img src="images/whatsapp.png" alt="WhatsApp" class="whatsapp-icon"></a> - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Vérifier si le mode faire-part uniquement est activé
+        if (CONFIG.FAIREPART_ONLY_MODE) {
+            window.location.href = 'auth';
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('rsvp-form');
+            const presenceSelect = document.getElementById('presence');
+            const personnesSection = document.getElementById('personnes-section');
+            const addBtn = document.getElementById('add-btn');
+            const removeLastBtn = document.getElementById('remove-last-btn');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+
+            let personneCounter = 0;
+
+            // Ajouter une personne par défaut au chargement
+            addPersonne();
+
+            // Afficher/masquer les options selon la présence
+            presenceSelect.addEventListener('change', () => {
+                if (presenceSelect.value === 'oui') {
+                    // Afficher les options pour toutes les personnes
+                    document.querySelectorAll('.options-personne').forEach(el => {
+                        el.classList.remove('hidden');
+                    });
+                } else {
+                    // Masquer les options pour toutes les personnes
+                    document.querySelectorAll('.options-personne').forEach(el => {
+                        el.classList.add('hidden');
+                    });
+                }
+            });
+
+            // Ajouter une personne
+            addBtn.addEventListener('click', () => {
+                addPersonne();
+            });
+
+            // Supprimer la dernière personne
+            removeLastBtn.addEventListener('click', () => {
+                removeLastPersonne();
+            });
+
+            // Fonction pour créer une personne
+            function addPersonne() {
+                personneCounter++;
+                const id = personneCounter;
+
+                const personneDiv = document.createElement('div');
+                personneDiv.classList.add('personne-item');
+                personneDiv.dataset.id = id;
+                personneDiv.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personne-nom-${id}">Nom *</label>
+                            <input
+                                type="text"
+                                id="personne-nom-${id}"
+                                name="personne-nom-${id}"
+                                placeholder="Nom"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="personne-prenom-${id}">Prénom *</label>
+                            <input
+                                type="text"
+                                id="personne-prenom-${id}"
+                                name="personne-prenom-${id}"
+                                placeholder="Prénom"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="options-personne ${presenceSelect.value === 'oui' ? '' : 'hidden'}">
+                        <div class="form-group">
+                            <label>Végétarien(ne)</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="personne-vegetarien-${id}" value="oui">
+                                    <span>Oui</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="personne-vegetarien-${id}" value="non" checked>
+                                    <span>Non</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Participation à la chorale</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="personne-chorale-${id}" value="oui">
+                                    <span>Oui</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="personne-chorale-${id}" value="non" checked>
+                                    <span>Non</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                personnesSection.appendChild(personneDiv);
+                personnesSection.classList.remove('hidden');
+
+                // Afficher le bouton -1 seulement s'il y a au moins 2 personnes
+                const personneCount = personnesSection.querySelectorAll('.personne-item').length;
+                if (personneCount >= 2) {
+                    removeLastBtn.classList.remove('hidden');
+                }
+            }
+
+            // Fonction pour supprimer la dernière personne
+            function removeLastPersonne() {
+                const personneItems = personnesSection.querySelectorAll('.personne-item');
+                if (personneItems.length > 1) { // Ne supprimer que s'il y a plus d'une personne
+                    const lastItem = personneItems[personneItems.length - 1];
+                    lastItem.remove();
+
+                    // Masquer le bouton -1 s'il ne reste qu'une personne
+                    if (personnesSection.querySelectorAll('.personne-item').length === 1) {
+                        removeLastBtn.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Soumission du formulaire
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const data = {
+                    presence: formData.get('presence'),
+                    personnes: [],
+                    message: formData.get('message') || '',
+                    timestamp: new Date().toISOString()
+                };
+
+                // Récupérer toutes les personnes
+                document.querySelectorAll('.personne-item').forEach(item => {
+                    const id = item.dataset.id;
+                    const nom = formData.get(`personne-nom-${id}`);
+                    const prenom = formData.get(`personne-prenom-${id}`);
+                    if (nom && prenom) {
+                        data.personnes.push({
+                            nom: nom.trim(),
+                            prenom: prenom.trim(),
+                            vegetarien: formData.get(`personne-vegetarien-${id}`) || 'non',
+                            chorale: formData.get(`personne-chorale-${id}`) || 'non'
+                        });
+                    }
+                });
+
+                setLoading(true, submitBtn, btnText, btnLoader);
+
+                try {
+                    // Créer un FormData pour envoyer en format form-data
+                    const submitFormData = new FormData();
+                    submitFormData.append('payload', JSON.stringify(data));
+
+                    const response = await fetch(CONFIG.RSVP_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                        body: submitFormData
+                    });
+
+                    if (response.ok) {
+                        // Masquer le formulaire avec animation
+                        form.style.opacity = '0';
+                        form.style.transform = 'scale(0.95)';
+
+                        setTimeout(() => {
+                            form.classList.add('hidden');
+                            // Afficher la validation avec animation
+                            const successValidation = document.getElementById('success-validation');
+                            successValidation.classList.remove('hidden');
+                            setTimeout(() => {
+                                successValidation.style.opacity = '1';
+                                successValidation.style.transform = 'scale(1)';
+                                // Démarrer les feux d'artifice
+                                startFireworks();
+                            }, 10);
+                        }, 300);
+                    } else {
+                        throw new Error('Erreur serveur');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    showConfirmation(confirmationMessage, 'error', 'Une erreur est survenue. Veuillez réessayer ou nous contacter directement.');
+                } finally {
+                    setLoading(false, submitBtn, btnText, btnLoader);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

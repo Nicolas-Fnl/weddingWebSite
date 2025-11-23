@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musique - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="./" class="nav-logo">D & N</a>
+            <ul class="nav-menu">
+                <li><a href="hebergements">Hébergements</a></li>
+                <li><a href="cadeaux">Liste de Mariage</a></li>
+                <li><a href="musique" class="active">Musique</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Section Musique -->
+    <section class="section musique-page">
+        <div class="container">
+            <h1 class="page-title">La Playlist des Invités</h1>
+            <p class="page-subtitle">
+                Dis-nous ce qui te fait danser : <br>On s’occupe du reste
+            </p>
+
+            <div class="playlist-container">
+                <div class="search-section">
+                    <div class="search-container">
+                        <input
+                            type="text"
+                            class="search-input"
+                            id="searchInput"
+                            placeholder="🔍 Recherche une chanson..."
+                            autocomplete="off"
+                        />
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+
+                    <div class="playlist-section">
+                        <h2>Les sons déjà ajoutés</h2>
+                        <ul class="playlist" id="playlist"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} <a href="" id="whatsappLink" target="_blank" rel="noopener noreferrer" onclick="return false"><img src="images/whatsapp.png" alt="WhatsApp" class="whatsapp-icon"></a> - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Vérifier si le mode faire-part uniquement est activé
+        if (CONFIG.FAIREPART_ONLY_MODE) {
+            window.location.href = 'auth';
+        }
+    </script>
+</body>
+</html>
