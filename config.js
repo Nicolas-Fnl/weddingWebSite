@@ -19,7 +19,7 @@ const CONFIG = {
 
     // Mode faire-part uniquement (redirection forcée vers fairepart.html)
     // Mettre à false pour ouvrir l'accès à tout le site
-    FAIREPART_ONLY_MODE: true,
+    FAIREPART_ONLY_MODE: false,
 
     // Noms des mariés (chiffrés avec le token d'authentification)
     ENCRYPTED_NAMES: {
