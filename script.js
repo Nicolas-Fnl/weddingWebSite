@@ -153,8 +153,8 @@ function initFloatingRSVP() {
     const currentPath = window.location.pathname;
     const currentPage = currentPath.split('/').pop() || '';
 
-    // Ne pas afficher le bouton sur la page RSVP, auth et fairepart
-    const excludedPages = ['rsvp.html', 'rsvp', 'auth.html', 'auth', 'fairepart.html', 'fairepart'];
+    // Ne pas afficher le bouton sur la page RSVP, auth, fairepart et photos
+    const excludedPages = ['rsvp.html', 'rsvp', 'auth.html', 'auth', 'fairepart.html', 'fairepart', 'photos.html', 'photos'];
 
     // Vérifier si on est sur une page exclue
     if (excludedPages.some(page => currentPath.includes(page) || currentPage === page)) {

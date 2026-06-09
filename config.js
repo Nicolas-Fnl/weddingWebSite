@@ -38,7 +38,10 @@ const CONFIG = {
     SPOTIFY_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyknXZGKFcS06roVJeTdEOPiNPgOw5cPiQU1Wc1tmlvCa5l6kQqHo9G83prnvjCW66f/exec',
 
     // Lien WhatsApp communauté (chiffré avec le token d'authentification)
-    ENCRYPTED_WHATSAPP_LINK: 'yw3bOmSa1HKVBVtrUMsRTQ==:CL3/rYOYaMRJVAgPG28m/U7qPXqc8OqSUjiMRjUvpwOVR37EnV2jgJVgrYEsGg9iH8Ea52jl/lRl5bjfsw2Pmg=='
+    ENCRYPTED_WHATSAPP_LINK: 'yw3bOmSa1HKVBVtrUMsRTQ==:CL3/rYOYaMRJVAgPG28m/U7qPXqc8OqSUjiMRjUvpwOVR37EnV2jgJVgrYEsGg9iH8Ea52jl/lRl5bjfsw2Pmg==',
+
+    // URL du Google Apps Script pour l'upload de photos vers Drive
+    PHOTOS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwEgI6mpvWuJsNo1QSLweHozU4X9BGDN9wNjjWLmpmuk1PyFQLF5VnpfIMg-RBfz_wb7A/exec'
 };
 
 // Ne pas modifier en dessous de cette ligne

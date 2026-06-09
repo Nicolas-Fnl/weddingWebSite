@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photos - Notre Mariage</title>
+    <script src="redirect.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="./" class="nav-logo">D & N</a>
+            <ul class="nav-menu">
+                <li><a href="hebergements">Hébergements</a></li>
+                <li><a href="cadeaux">Liste de Mariage</a></li>
+                <li><a href="musique">Musique</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="section photos-page">
+        <div class="container">
+            <h1 class="page-title">Vos Photos</h1>
+            <p class="page-subtitle">
+                Partagez vos plus beaux souvenirs de ce jour si spécial :<br>on s'en occupera avec tout notre amour.
+            </p>
+
+            <div class="photos-upload-container" id="uploadContainer">
+
+                <div class="upload-zone" id="uploadZone">
+                    <input
+                        type="file"
+                        id="photoInput"
+                        accept="image/*"
+                        multiple
+                        class="photo-input-hidden"
+                    >
+                    <div class="upload-zone-content">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-label">Appuyez pour ajouter des photos</p>
+                        <p class="upload-hint">ou glissez vos fichiers ici</p>
+                    </div>
+                </div>
+
+                <div class="photos-preview" id="photosPreview" style="display: none;">
+                    <div class="photos-preview-header">
+                        <span class="photo-count" id="photoCount"></span>
+                        <button class="btn-clear" id="clearBtn" type="button">Tout effacer</button>
+                    </div>
+                    <div class="photos-grid" id="photosGrid"></div>
+                </div>
+
+                <div class="upload-actions" id="uploadActions" style="display: none;">
+                    <button class="btn-submit" id="uploadBtn" type="button">
+                        Envoyer les photos
+                    </button>
+                </div>
+
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <p class="progress-status" id="progressStatus">Préparation...</p>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <p class="progress-detail" id="progressDetail"></p>
+                </div>
+
+            </div>
+
+            <div id="upload-success" class="success-validation hidden">
+                <canvas id="fireworks-canvas" class="fireworks-canvas"></canvas>
+                <div class="success-content">
+                    <h2 class="success-title">Merci ✓</h2>
+                    <p class="success-text" id="successText"></p>
+                    <p class="success-subtext">Ces souvenirs comptent énormément pour nous. ❤️</p>
+                    <button class="btn-primary" id="uploadMoreBtn" type="button" style="margin-top: 1.5rem;">
+                        Envoyer d'autres photos
+                    </button>
+                </div>
+            </div>
+
+            <div id="upload-error" class="confirmation-message hidden"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 {{bride_groom}} <a href="" id="whatsappLink" target="_blank" rel="noopener noreferrer" onclick="return false"><img src="images/whatsapp.png" alt="WhatsApp" class="whatsapp-icon"></a> - Avec tout notre amour</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        if (CONFIG.FAIREPART_ONLY_MODE) {
+            window.location.href = 'auth';
+        }
+
+        // ============================================
+        // PAGE PHOTOS
+        // Flux : Client → base64 → Apps Script → Drive
+        // Le XHR sur l'envoi à Apps Script donne le
+        // vrai progress (c'est le goulot d'étranglement)
+        // ============================================
+
+        let selectedPhotos = [];
+
+        const photoInput     = document.getElementById('photoInput');
+        const uploadZone     = document.getElementById('uploadZone');
+        const photosPreview  = document.getElementById('photosPreview');
+        const photosGrid     = document.getElementById('photosGrid');
+        const photoCountEl   = document.getElementById('photoCount');
+        const uploadActions  = document.getElementById('uploadActions');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar    = document.getElementById('progressBar');
+        const progressStatus = document.getElementById('progressStatus');
+        const progressDetail = document.getElementById('progressDetail');
+        const uploadSuccess  = document.getElementById('upload-success');
+        const uploadError    = document.getElementById('upload-error');
+        const uploadContainer= document.getElementById('uploadContainer');
+
+        // --- Sélection ---
+
+        uploadZone.addEventListener('click', () => photoInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            addPhotos(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            addPhotos(Array.from(e.target.files));
+            photoInput.value = '';
+        });
+
+        function addPhotos(files) {
+            if (!files.length) return;
+            files.forEach(file => {
+                const isDupe = selectedPhotos.some(p => p.name === file.name && p.size === file.size);
+                if (!isDupe) selectedPhotos.push(file);
+            });
+            renderPreviews();
+        }
+
+        // --- Prévisualisation ---
+
+        function renderPreviews() {
+            const has = selectedPhotos.length > 0;
+            photosPreview.style.display = has ? 'block' : 'none';
+            uploadActions.style.display = has ? 'flex' : 'none';
+            if (!has) return;
+
+            const n = selectedPhotos.length;
+            photoCountEl.textContent = `${n} photo${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}`;
+
+            photosGrid.innerHTML = '';
+            selectedPhotos.forEach((file, i) => {
+                const item = document.createElement('div');
+                item.className = 'photo-preview-item';
+                item.innerHTML = `
+                    <img class="photo-preview-img" id="prev-${i}" alt="${file.name}">
+                    <button class="photo-remove-btn" type="button" onclick="removePhoto(${i})">×</button>
+                `;
+                photosGrid.appendChild(item);
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const el = document.getElementById(`prev-${i}`);
+                    if (el) el.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.removePhoto = (i) => {
+            selectedPhotos.splice(i, 1);
+            renderPreviews();
+        };
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            selectedPhotos = [];
+            renderPreviews();
+        });
+
+        document.getElementById('uploadMoreBtn').addEventListener('click', () => {
+            selectedPhotos = [];
+            uploadSuccess.classList.add('hidden');
+            uploadContainer.style.display = 'block';
+            uploadZone.style.display = 'flex';
+            renderPreviews();
+        });
+
+        // --- Progression ---
+
+        function setProgress(pct, status, detail = '') {
+            progressBar.style.width = `${Math.min(100, Math.round(pct))}%`;
+            if (status !== undefined) progressStatus.textContent = status;
+            progressDetail.textContent = detail;
+        }
+
+        // --- Étape 1 : obtenir toutes les URLs d'upload en un seul appel Apps Script ---
+
+        async function getUploadUrls(files) {
+            const params = new URLSearchParams();
+            params.append('payload', JSON.stringify({
+                action: 'getUploadUrls',
+                token:  localStorage.getItem('wedding_auth_token') || '',
+                files:  files.map(f => ({ originalName: f.name, mimeType: f.type || 'image/jpeg' }))
+            }));
+
+            const resp = await fetch(CONFIG.PHOTOS_SCRIPT_URL, { method: 'POST', body: params });
+            if (!resp.ok) throw new Error(`Erreur serveur: ${resp.status}`);
+            const data = await resp.json();
+            if (!data.success) throw new Error(data.error || 'Erreur Apps Script');
+            return data.uploadUrls;
+        }
+
+        // --- Étape 2 : upload direct vers Drive via XHR (progress natif) ---
+
+        function uploadToDrive(file, uploadUrl, onProgress) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', uploadUrl, true);
+                xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg');
+
+                // Vrai lorsque tous les bytes ont été envoyés au serveur
+                let bytesSent = false;
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) onProgress((e.loaded / e.total) * 100);
+                };
+
+                // Se déclenche quand l'envoi est terminé (avant la réponse)
+                xhr.upload.onload = () => { bytesSent = true; };
+
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) resolve();
+                    else reject(new Error(`Échec upload Drive: ${xhr.status}`));
+                };
+
+                xhr.onerror = () => {
+                    // Si les bytes sont partis, c'est CORS qui bloque la lecture
+                    // de la réponse (pas un vrai échec réseau) — l'upload a réussi
+                    if (bytesSent) resolve();
+                    else reject(new Error('Erreur réseau lors de l\'envoi'));
+                };
+
+                xhr.send(file);
+            });
+        }
+
+        // --- Upload principal ---
+
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            if (!selectedPhotos.length) return;
+
+            if (!CONFIG.PHOTOS_SCRIPT_URL) {
+                showConfirmation(uploadError, 'error', 'La fonctionnalité photos n\'est pas encore configurée.');
+                return;
+            }
+
+            document.getElementById('uploadBtn').disabled = true;
+            uploadActions.style.display  = 'none';
+            photosPreview.style.display  = 'none';
+            uploadZone.style.display     = 'none';
+            uploadProgress.style.display = 'block';
+
+            const total      = selectedPhotos.length;
+            let successCount = 0;
+            const errors     = [];
+
+            try {
+                // Étape 1 : un seul appel pour toutes les URLs
+                setProgress(0, 'Préparation...', `${total} photo${total > 1 ? 's' : ''}`);
+                const uploadUrls = await getUploadUrls(selectedPhotos);
+
+                // Étape 2 : tous les uploads en parallèle
+                const progresses = new Array(total).fill(0);
+                const updateProgress = () => {
+                    const overall = progresses.reduce((sum, p) => sum + p, 0) / total;
+                    setProgress(overall, `Envoi en cours...`, `${total} photo${total > 1 ? 's' : ''}`);
+                };
+
+                const results = await Promise.allSettled(
+                    selectedPhotos.map((file, i) =>
+                        uploadToDrive(file, uploadUrls[i], (pct) => {
+                            progresses[i] = pct;
+                            updateProgress();
+                        })
+                    )
+                );
+
+                results.forEach((result, i) => {
+                    if (result.status === 'fulfilled') successCount++;
+                    else {
+                        errors.push(selectedPhotos[i].name);
+                        console.error(`[PHOTOS] Échec ${selectedPhotos[i].name}:`, result.reason);
+                    }
+                });
+
+            } catch (err) {
+                console.error('[PHOTOS] Erreur préparation:', err);
+                errors.push(...selectedPhotos.map(f => f.name));
+            }
+
+            setProgress(100, 'Terminé !', '');
+            await new Promise(r => setTimeout(r, 400));
+
+            uploadProgress.style.display = 'none';
+
+            if (successCount > 0) {
+                uploadContainer.style.display = 'none';
+                const n = successCount;
+                let msg = `Tu as partagé ${n} magnifique${n > 1 ? 's' : ''} souvenir${n > 1 ? 's' : ''} avec nous.`;
+                if (errors.length) msg += ` (${errors.length} photo${errors.length > 1 ? 's' : ''} n'ont pas pu être envoyées)`;
+                document.getElementById('successText').textContent = msg;
+                uploadSuccess.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    uploadSuccess.style.opacity = '1';
+                    uploadSuccess.style.transform = 'scale(1)';
+                });
+                startFireworks();
+            } else {
+                uploadContainer.style.display = 'block';
+                uploadZone.style.display      = 'flex';
+                photosPreview.style.display   = 'block';
+                uploadActions.style.display   = 'flex';
+                document.getElementById('uploadBtn').disabled = false;
+                showConfirmation(uploadError, 'error', 'Aucune photo n\'a pu être envoyée. Veuillez réessayer.');
+            }
+        });
+    </script>
+</body>
+</html>
