@@ -73,9 +73,9 @@
             <div id="upload-success" class="success-validation hidden">
                 <canvas id="fireworks-canvas" class="fireworks-canvas"></canvas>
                 <div class="success-content">
-                    <h2 class="success-title">Merci ✓</h2>
+                    <h2 class="success-title">✓</h2>
                     <p class="success-text" id="successText"></p>
-                    <p class="success-subtext">Ces souvenirs comptent énormément pour nous. ❤️</p>
+                    <p class="success-subtext">Ça compte énormément pour nous. ❤️</p>
                     <button class="btn-primary" id="uploadMoreBtn" type="button" style="margin-top: 1.5rem;">
                         Envoyer d'autres photos
                     </button>
@@ -320,7 +320,7 @@
             if (successCount > 0) {
                 uploadContainer.style.display = 'none';
                 const n = successCount;
-                let msg = `Tu as partagé ${n} magnifique${n > 1 ? 's' : ''} souvenir${n > 1 ? 's' : ''} avec nous.`;
+                let msg = `Merci d'avoir partagé ${n} souvenir${n > 1 ? 's' : ''} avec nous.`;
                 if (errors.length) msg += ` (${errors.length} photo${errors.length > 1 ? 's' : ''} n'ont pas pu être envoyées)`;
                 document.getElementById('successText').textContent = msg;
                 uploadSuccess.classList.remove('hidden');
